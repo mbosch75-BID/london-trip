@@ -1,0 +1,206 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>London Trip &middot; 15-19 June</title>
+<meta name="theme-color" content="#13223a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="London Trip">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='40' fill='%2313223a'/%3E%3Ctext x='90' y='120' font-size='90' text-anchor='middle' fill='%23cda350' font-family='Georgia'%3EL%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='14' fill='%2313223a'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23cda350' font-family='Georgia'%3EL%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#13223a;--ink2:#1c2f4e;--parch:#f4ead4;--parchedge:#e2d2af;--brass:#cda350;--brassd:#9b7a2e;--red:#c8472e;--cream:#faf4e6;--muted:#9bafce;--muted2:#6f86a8}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:radial-gradient(1100px 600px at 80% -10%,#1f3458 0,transparent 60%),var(--ink);color:var(--cream);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.5;padding-bottom:70px}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header.hero{text-align:center;padding:26px 0 10px}
+.kick{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.3em;color:var(--brass);text-transform:uppercase}
+h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(34px,10vw,56px);margin:6px 0 2px;letter-spacing:-1px}
+h1 .g{color:var(--brass);font-style:italic}
+.hero p{color:var(--muted);font-size:14px;margin:6px 0 0}
+nav.tabs{position:sticky;top:0;z-index:40;display:flex;gap:6px;background:rgba(19,34,58,.92);backdrop-filter:blur(8px);padding:10px 0;margin:10px 0;justify-content:center;flex-wrap:wrap}
+nav.tabs button{background:#1d3050;border:1px solid #2c456f;color:var(--cream);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+nav.tabs button.on{background:var(--brass);color:#22190a;border-color:var(--brass)}
+.panel{display:none}.panel.on{display:block}
+section.daycard{border-left:4px solid var(--c);background:#172a47;border-radius:12px;padding:14px 14px 6px;margin:12px 0}
+.daylabel{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.16em;color:var(--c);text-transform:uppercase}
+.daytitle{font-family:Georgia,serif;font-size:20px;margin:2px 0 8px}
+ol.stops{list-style:none;margin:0;padding:0}
+ol.stops li{display:flex;gap:11px;padding:9px 0;border-top:1px solid rgba(255,255,255,.07)}
+.snum{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;font-weight:700;text-align:center;line-height:26px;font-size:13px}
+.snum.dep{background:#5b6f8c}
+.stime{font-size:14px}.stime b{color:#fff}
+.snote{color:var(--muted);font-size:12.5px;margin-top:2px}
+.kindtag{font-size:9px;letter-spacing:.5px;padding:2px 6px;border-radius:5px;font-weight:700;margin-left:4px;vertical-align:middle}
+.k-res{background:var(--brass);color:#2a2008}.k-food{background:#e7d9bd;color:#5b4413}.k-sight{background:#26527e;color:#dfeaf6}.k-hotel{background:#2f6f68;color:#eafff9}.k-depart{background:#33445c;color:#cdd9ea}
+.dir{display:inline-block;margin-top:4px;font-size:12px;color:var(--brass);text-decoration:none;border:1px solid var(--brassd);border-radius:7px;padding:3px 8px}
+#map{height:62vh;min-height:380px;border-radius:14px;border:1px solid #2c456f;margin:8px 0}
+.mfilter{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.mfilter button{font-size:12px;border-radius:999px;border:1px solid #2c456f;background:#1d3050;color:var(--cream);padding:6px 11px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.mfilter button i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.mfilter button.off{opacity:.4}
+.resrow{display:flex;justify-content:space-between;gap:12px;background:#172a47;border:1px solid #24395c;border-radius:10px;padding:11px 13px;margin:9px 0}
+.reswhen{font-family:ui-monospace,monospace;font-size:12px;color:var(--brass)}
+.reswhat{font-size:13.5px;margin-top:2px}
+.resstatus{font-size:11px;font-weight:700;color:#7fd0c4;white-space:nowrap}
+.tips{background:#172a47;border:1px solid #24395c;border-radius:10px;padding:8px 14px;margin-top:12px}
+.tips li{margin:4px 0;font-size:13px;color:#cdd9ea}
+/* ----- hunt ----- */
+.meter{position:sticky;top:58px;z-index:30;background:rgba(19,34,58,.9);backdrop-filter:blur(8px);border:1px solid rgba(205,163,80,.3);border-radius:14px;padding:12px 14px;margin:8px 0}
+.meterTop{display:flex;justify-content:space-between;align-items:baseline}
+.rank{font-family:Georgia,serif;font-weight:700;font-size:17px}.rank b{font-size:20px}
+.pts{font-family:ui-monospace,monospace;font-size:12px;color:var(--brass)}
+.bar{height:12px;border-radius:99px;background:#0d1a2e;margin-top:8px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--brassd),var(--brass) 70%,#f0d588);transition:width .5s}
+.ticks{display:flex;justify-content:space-between;margin-top:6px;font-family:ui-monospace,monospace;font-size:9px;color:var(--muted2)}
+.ticks span.hit{color:var(--brass)}
+.find{position:relative;display:flex;gap:12px;background:var(--parch);color:#33291a;border:1px solid var(--parchedge);border-radius:13px;padding:13px;margin:10px 0;cursor:pointer;overflow:hidden}
+.find.done{background:#ece0c4;border-color:var(--brass)}
+.find.legend{border-left:4px solid var(--brass)}
+.cb{flex:0 0 auto;width:28px;height:28px;border-radius:50%;border:2.5px solid #b9a679;background:#fbf5e6;position:relative}
+.find.done .cb{background:var(--red);border-color:#a3361f}
+.cb svg{position:absolute;inset:0;margin:auto;width:16px;height:16px;stroke:#fff;stroke-width:3.4;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .25s}
+.find.done .cb svg{stroke-dashoffset:0}
+.fname{font-family:Georgia,serif;font-weight:700;font-size:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ftag{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.1em;background:var(--brass);color:#2a2008;border-radius:5px;padding:2px 6px;text-transform:uppercase}
+.fwhy{font-size:13px;color:#5a4d36;margin-top:4px}
+.fsnap{font-size:12px;color:#8a5a3a;margin-top:6px;font-weight:600}
+.fp{position:absolute;right:11px;bottom:8px;font-family:ui-monospace,monospace;font-size:10px;color:#9a8453}
+.stamp{position:absolute;right:-4px;top:8px;font-family:Georgia,serif;font-weight:800;font-size:14px;color:var(--red);border:2.5px solid var(--red);border-radius:7px;padding:2px 8px;text-transform:uppercase;opacity:0;transform:rotate(10deg) scale(.5);transition:.28s cubic-bezier(.2,1.4,.4,1)}
+.find.done .stamp{opacity:.9;transform:rotate(-8deg) scale(1)}
+.hdaytitle{font-family:Georgia,serif;font-size:18px;color:var(--c);border-bottom:2px solid var(--c);padding-bottom:3px;margin:20px 0 4px}
+.vault{margin-top:24px;border:1.5px solid rgba(205,163,80,.4);border-radius:16px;padding:20px;text-align:center;background:linear-gradient(180deg,var(--ink2),var(--ink))}
+.vault h2{font-family:Georgia,serif;font-size:22px;margin:0 0 4px}
+.lockNote{font-family:ui-monospace,monospace;font-size:11px;color:var(--muted)}
+#prize{width:100%;max-width:420px;border:1px dashed rgba(205,163,80,.5);background:rgba(255,255,255,.05);color:var(--cream);text-align:center;border-radius:10px;padding:12px;font-family:Georgia,serif;font-size:17px;margin-top:12px;outline:none}
+.claim{margin-top:14px;border:none;border-radius:12px;padding:13px 20px;font-family:Georgia,serif;font-weight:700;font-size:16px;width:100%;max-width:420px;background:#27384f;color:var(--muted2);pointer-events:none}
+.claim.ready{background:linear-gradient(90deg,var(--red),#e0633f);color:#fff;pointer-events:auto}
+footer{text-align:center;color:var(--muted2);font-size:12px;margin:26px 0}
+.reset{background:none;border:1px solid rgba(255,255,255,.14);color:var(--muted);border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;margin-top:8px}
+.confetti{position:fixed;top:-12px;width:10px;height:14px;z-index:99;border-radius:2px;pointer-events:none}
+@keyframes fall{to{transform:translateY(108vh) rotate(720deg);opacity:.9}}
+.leaflet-popup-content{font-family:Inter,sans-serif}
+</style></head><body>
+<div class="wrap">
+<header class="hero"><div class="kick">Family Trip &middot; 15&ndash;19 June</div>
+<h1>London <span class="g">2026</span></h1>
+<p>Tap a tab. Everything's here: the plan, the map, bookings and the treasure hunt.</p></header>
+<nav class="tabs">
+<button data-t="itin" class="on">Itinerary</button>
+<button data-t="map">Map</button>
+<button data-t="res">Bookings</button>
+<button data-t="hunt">Treasure Hunt</button>
+</nav>
+<div id="itin" class="panel on"></div>
+<div id="map-panel" class="panel"><div class="mfilter" id="mfilter"></div><div id="map"></div></div>
+<div id="res" class="panel"></div>
+<div id="hunt" class="panel"></div>
+<footer>Made for the London trip &middot; progress saves on this phone.<br><button class="reset" id="reset">Reset the hunt</button></footer>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const DATA = {"days": [{"label": "Day 1 · Mon 15 Jun", "title": "Arrival — Paddington & the Royal Parks", "color": "#2f8f8a", "stops": [{"t": "Morning", "n": "Hilton London Metropole", "lat": 51.5193229, "lon": -0.1695228, "kind": "hotel", "note": "Check in / drop bags even if the room isn't ready."}, {"t": "12:30", "n": "Paddington Station", "lat": 51.5162982, "lon": -0.1765854, "kind": "sight", "note": "Paddington Bear statue on Platform 1 + Brunel's iron-and-glass roof."}, {"t": "2:00", "n": "Diana Memorial Playground", "lat": 51.5087072, "lon": -0.1878374, "kind": "sight", "note": "Kensington Gardens — pirate ship, Peter Pan, Italian Gardens, wild parakeets."}, {"t": "7:00", "n": "Soor Lebanese Cuisine", "lat": 51.5209042, "lon": -0.1710797, "kind": "food", "note": "Easy arrival-night dinner on Edgware Rd, 4 min from the hotel."}], "finds": [{"n": "Paddington Bear statue", "t": "", "p": 10, "why": "The famous bear came from 'Darkest Peru' and arrived at this exact station — the books begin right here on the platform.", "snap": "Sit next to him with his battered suitcase (Platform 1)."}, {"n": "A houseboat in Little Venice", "t": "", "p": 10, "why": "A hidden canal where people actually live on long, brightly painted narrowboats. It feels nothing like a big city.", "snap": "A colourful boat mirrored in the still water."}, {"n": "The Peter Pan statue", "t": "Hidden", "p": 20, "why": "Author J.M. Barrie had it placed secretly overnight in 1912 so children would think it appeared by magic.", "snap": "The tiny fairies and animals climbing the base."}, {"n": "The Elfin Oak", "t": "Hidden", "p": 20, "why": "A 900-year-old tree stump carved with little elves, witches and animals hiding in the bark.", "snap": "Find the smallest creature you can spot."}, {"n": "A wild green parakeet", "t": "Legendary", "p": 30, "why": "Thousands of bright-green parrots live wild in the parks — and nobody knows for sure how they got to London.", "snap": "One in flight or perched (they sometimes land on an open hand)."}, {"n": "The pirate ship", "t": "", "p": 10, "why": "The giant wooden galleon at the Diana Memorial Playground, built for exactly this kind of adventure.", "snap": "At the ship's wheel, captain's face on."}, {"n": "The golden Albert Memorial", "t": "", "p": 10, "why": "A glittering gold monument Queen Victoria built for her husband — over the top on purpose.", "snap": "The gleaming gold figure under the spire."}, {"n": "Paddington's Brunel roof", "t": "", "p": 10, "why": "The station's huge wave-like iron-and-glass roof was designed by Isambard Kingdom Brunel in 1854 — engineering built like a cathedral.", "snap": "Phone up at the curved glass roof spans."}, {"n": "The Merchant Square fan bridge", "t": "Hidden", "p": 20, "why": "A hidden footbridge in Paddington Basin that lifts in five steel 'fingers' like a folding fan — catch it opening if you can.", "snap": "The angled steel beams of the bridge."}, {"n": "The Italian Gardens", "t": "Hidden", "p": 20, "why": "Ornamental Victorian water gardens at the top of the Long Water — said to be a gift from Prince Albert to Queen Victoria.", "snap": "The fountains and carved stone urns."}, {"n": "Royal Albert Hall", "t": "", "p": 10, "why": "The vast round red-brick concert hall from 1871 — a dome you'll recognise the instant you see it.", "snap": "The whole oval building in one frame."}, {"n": "Kensington Palace gates", "t": "", "p": 10, "why": "A working royal home for 300 years — the golden gates became a sea of flowers for Princess Diana in 1997.", "snap": "The ornate gold gates."}, {"n": "The pastel houses of Notting Hill", "t": "Bonus", "p": 20, "why": "The candy-coloured terraced houses around Portobello Road are one of London's most-photographed streets — and the setting of the film 'Notting Hill'. A short hop west of the hotel.", "snap": "A row of pink, blue and mint houses (or the famous travel-bookshop)."}]}, {"label": "Day 2 · Tue 16 Jun", "title": "Royal London + High Tea", "color": "#8a5cc7", "stops": [{"t": "10:30", "n": "Big Ben & Westminster", "lat": 51.5007292, "lon": -0.1246254, "kind": "sight", "note": "Abbey, Horse Guards and the green Westminster Bridge are all here."}, {"t": "11:45", "n": "Buckingham Palace", "lat": 51.501364, "lon": -0.14189, "kind": "sight", "note": "Via St James's Park (pelicans + Blue Bridge view). Check the Changing of the Guard schedule."}, {"t": "1:00 PM", "n": "Diamond Jubilee Tea Salon", "lat": 51.5082583, "lon": -0.1382722, "kind": "res", "note": "RESERVATION — afternoon tea at Fortnum & Mason, 4th floor."}, {"t": "6:30 PM", "n": "Ayllu Paddington", "lat": 51.5192168, "lon": -0.1792079, "kind": "res", "note": "RESERVATION — dinner back near the hotel. Entrance downstairs under the Grill Bar."}], "finds": [{"n": "Big Ben on the hour", "t": "", "p": 10, "why": "The bell weighs 13.7 tonnes and its bongs are broadcast around the world. Time your visit to hear it.", "snap": "The clock face right as it chimes."}, {"n": "Boudica's war chariot", "t": "", "p": 20, "why": "A warrior queen who burned Roman London to the ground in AD 60 — now charging on a bronze chariot by the bridge.", "snap": "The rearing horses, no reins."}, {"n": "A mounted Horse Guard", "t": "", "p": 10, "why": "The King's official bodyguards, sitting perfectly still on horseback at Horse Guards.", "snap": "Standing beside the horse (look — don't touch!)."}, {"n": "A pelican in St James's Park", "t": "", "p": 20, "why": "Pelicans have lived here since 1664, a gift from a Russian ambassador. They get fed in the afternoon.", "snap": "One near Duck Island around 2:30pm."}, {"n": "The Royal Standard flag", "t": "Bonus", "p": 20, "why": "If this flag is flying over Buckingham Palace, the King is actually home right now. If not, he's out.", "snap": "The flagpole on the palace roof."}, {"n": "The Fortnum & Mason clock", "t": "", "p": 20, "why": "Every hour, models of Mr Fortnum and Mr Mason step out and bow to each other to chimes — right above your tea.", "snap": "The two figures over the shopfront on Piccadilly."}, {"n": "Eros at Piccadilly Circus", "t": "", "p": 10, "why": "One of the first statues ever cast in aluminium, surrounded by the most famous lights in London.", "snap": "The winged archer under the giant screens."}, {"n": "Climb a Trafalgar Square lion", "t": "", "p": 10, "why": "Four huge bronze lions guard Nelson's Column — cast from the metal of melted-down enemy cannons.", "snap": "Sitting up on a lion's paw."}, {"n": "Westminster Abbey", "t": "", "p": 10, "why": "Every English coronation since 1066 has happened here, and many kings and queens lie buried inside this soaring Gothic church.", "snap": "The twin towers of the west front."}, {"n": "Westminster Bridge", "t": "", "p": 10, "why": "It's painted green to match the seats in the House of Commons at this end — Lambeth Bridge upriver is red, for the Lords.", "snap": "The green ironwork with Big Ben behind."}, {"n": "The Blue Bridge view", "t": "Hidden", "p": 20, "why": "From the little blue bridge in St James's Park you get the most fairytale view in London — the palace one way, a skyline of domes and turrets the other.", "snap": "The 'castle' skyline over the lake."}, {"n": "Admiralty Arch", "t": "", "p": 10, "why": "A grand triple-arched gateway joining Trafalgar Square to The Mall — there's even a tiny carved nose hidden inside one arch.", "snap": "Looking through the arches down The Mall."}, {"n": "London's smallest police station", "t": "Hidden", "p": 20, "why": "A one-person police post hidden inside a hollow stone lamp-base in the corner of Trafalgar Square.", "snap": "The little round stone 'box' everyone walks straight past."}]}, {"label": "Day 3 · Wed 17 Jun", "title": "British Museum + The Lion King", "color": "#c0392b", "stops": [{"t": "10:50", "n": "The British Museum", "lat": 51.5194133, "lon": -0.1269566, "kind": "sight", "note": "Book a free slot. Rosetta Stone, mummies, Easter Island statue, glass roof."}, {"t": "1:30", "n": "Crispy Rolls / My Hiro", "lat": 51.5079325, "lon": -0.1233976, "kind": "food", "note": "Lunch — 45 Villiers St, near Embankment. Walk down through Covent Garden."}, {"t": "3:30", "n": "Humble Crumble (Seven Dials)", "lat": 51.513846, "lon": -0.1256687, "kind": "food", "note": "Crumble + unlimited custard. Neal's Yard & Goodwin's Court are nearby."}, {"t": "7:30 PM", "n": "The Lion King — Lyceum", "lat": 51.5115402, "lon": -0.1200807, "kind": "res", "note": "RESERVATION — evening show. Grab a pre-theatre bite first."}], "finds": [{"n": "The Rosetta Stone", "t": "", "p": 10, "why": "The carved stone that finally cracked the code of Egyptian hieroglyphs — the same message written in three scripts at once.", "snap": "Over the heads of the crowd around its case."}, {"n": "An Egyptian mummy", "t": "Bonus", "p": 20, "why": "Real mummies thousands of years old, wrapped and painted for the journey to the afterlife.", "snap": "A decorated coffin (sarcophagus)."}, {"n": "The Great Court glass roof", "t": "", "p": 10, "why": "Europe's largest covered square, under a swirling glass-and-steel roof of 3,212 panes — no two the same.", "snap": "Lying back with your phone pointed straight up."}, {"n": "A Covent Garden street act", "t": "", "p": 10, "why": "Performers have entertained on this spot since 1662 — today they audition for the right to perform.", "snap": "A juggler or a 'floating' act mid-trick."}, {"n": "Neal's Yard", "t": "Hidden", "p": 20, "why": "A secret rainbow-coloured courtyard tucked down a narrow alley in Seven Dials. Easy to walk straight past.", "snap": "The clashing bright walls and flowers."}, {"n": "The Seven Dials sundial", "t": "Hidden", "p": 20, "why": "One pillar with six sundials where seven streets meet — the seventh dial is the column itself.", "snap": "Looking straight up the pillar."}, {"n": "A crispy roll on Villiers St", "t": "Food", "p": 10, "why": "Your foodie mission: cheap sushi-meets-fried-chicken rolls near Embankment that went viral online.", "snap": "The roll before the first bite."}, {"n": "Humble Crumble custard", "t": "Food", "p": 10, "why": "Warm crumble with unlimited build-your-own custard, hidden in the Seven Dials market hall.", "snap": "The custard pour in action."}, {"n": "Cleopatra's Needle", "t": "Bonus", "p": 20, "why": "A 3,500-year-old Egyptian obelisk — older than London itself — guarded by two bronze sphinxes still scarred by a WWI bomb.", "snap": "The hieroglyphics or a sphinx's face."}, {"n": "Somerset House fountains", "t": "Bonus", "p": 20, "why": "55 water jets shoot straight up from the courtyard floor — in summer kids dart between them.", "snap": "Mid-jump in the water."}, {"n": "The Easter Island statue", "t": "Bonus", "p": 20, "why": "A four-tonne stone ancestor figure carved on Rapa Nui and brought to the British Museum in 1869 — towering over everyone around it.", "snap": "Looking up at the giant stone face."}, {"n": "Goodwin's Court", "t": "Hidden", "p": 20, "why": "A tiny gas-lit alley of curved Georgian shopfronts near Covent Garden — many believe it inspired Diagon Alley.", "snap": "The bow-fronted glass windows and old lamps."}, {"n": "Twinings tea shop", "t": "Hidden", "p": 20, "why": "London's oldest shop still on its original spot (since 1706) — a doorway so narrow you'd walk past it, on the Strand.", "snap": "The slim doorway with the golden lion above it."}, {"n": "The view from Waterloo Bridge", "t": "Bonus", "p": 20, "why": "Londoners call it the best free view in the city — St Paul's and the City one way, Big Ben and the Eye the other.", "snap": "The skyline looking both directions."}, {"n": "Platform 9¾ at King's Cross", "t": "Bonus", "p": 20, "why": "A luggage trolley vanishing into the wall, exactly like in Harry Potter — with a wizard shop right beside it. A short hop north of the museum.", "snap": "Pushing the half-buried trolley, scarf flying."}, {"n": "Carnaby Street", "t": "", "p": 10, "why": "A pedestrian street of bright shopfronts under giant colourful decorations — the home of London fashion since the 1960s, and very Instagram.", "snap": "Standing under the arch of overhead decorations."}, {"n": "The Lion King at the Lyceum", "t": "Legendary", "p": 30, "why": "The big one. The opening 'Circle of Life' with the animal puppets is one of theatre's all-time great moments.", "snap": "Outside the theatre before the show."}]}, {"label": "Day 4 · Thu 18 Jun", "title": "River, Tate Modern & Bankside", "color": "#2e6fb0", "stops": [{"t": "10:00", "n": "Tower Bridge (from the bank)", "lat": 51.5054564, "lon": -0.0753565, "kind": "sight", "note": "Photo from the riverside (no Tower entry today), then walk west along the Thames."}, {"t": "11:30", "n": "Borough Market", "lat": 51.5055826, "lon": -0.0904808, "kind": "food", "note": "Lunch. Winchester Palace ruins & HMS Belfast are right here."}, {"t": "1:30", "n": "Shakespeare's Globe", "lat": 51.508076, "lon": -0.097194, "kind": "sight", "note": "The round timber theatre on Bankside."}, {"t": "2:15", "n": "Tate Modern", "lat": 51.5075953, "lon": -0.0993564, "kind": "sight", "note": "Free. Turbine Hall + the viewing level for skyline views."}, {"t": "4:15", "n": "Millennium Bridge → St Paul's", "lat": 51.5138453, "lon": -0.0983506, "kind": "sight", "note": "Cross the 'wobbly bridge' straight to Wren's great dome."}, {"t": "8:30 PM", "n": "Sky Garden", "lat": 51.5112422, "lon": -0.0835493, "kind": "res", "note": "RESERVATION — book a free ticket (or a restaurant table). Sunset ~9:20pm."}], "finds": [{"n": "Tower Bridge from the bank", "t": "", "p": 10, "why": "The most photographed bridge in the world — and those 'medieval' towers are really steel, dressed up in stone in 1894.", "snap": "The whole bridge from the riverside, towers and all."}, {"n": "St Dunstan in the East", "t": "Hidden", "p": 20, "why": "A church bombed in the Blitz, now a magical ruin wrapped in climbing plants — one of London's most-photographed hidden gardens.", "snap": "The ivy framing the empty gothic windows."}, {"n": "HMS Belfast", "t": "Bonus", "p": 20, "why": "A real Second World War battle cruiser moored on the Thames, guns still aimed downriver.", "snap": "The grey warship against the skyline."}, {"n": "The Shard", "t": "", "p": 10, "why": "Western Europe's tallest building at 310m, shaped to look like a splinter of glass.", "snap": "Phone flat to a wall, looking straight up the point."}, {"n": "Borough Market (Bridget Jones)", "t": "Food", "p": 10, "why": "London's oldest food market and a film favourite — Bridget Jones lived in the flat right above it. Get the famous chocolate strawberries.", "snap": "A warm chocolate strawberry, or the green market sign."}, {"n": "Winchester Palace rose window", "t": "Hidden", "p": 20, "why": "The ruined wall of a 700-year-old bishop's palace with a beautiful stone rose window, tucked in a lane behind Borough Market.", "snap": "The circular window in the old ruin."}, {"n": "The Golden Hinde galleon", "t": "Bonus", "p": 20, "why": "A full-size replica of the Tudor ship Sir Francis Drake sailed all the way around the world.", "snap": "The masts of the little ship in its dock."}, {"n": "Shakespeare's Globe", "t": "", "p": 10, "why": "A faithful rebuild of the open-air wooden 'O' where Shakespeare's plays were first performed 400 years ago.", "snap": "The white-and-timber round theatre."}, {"n": "Tate Modern Turbine Hall", "t": "Bonus", "p": 20, "why": "A giant former power station turned free modern-art museum — the cavernous Turbine Hall holds huge installations, and the upper floors have skyline views.", "snap": "The vast hall, or your favourite weird artwork."}, {"n": "The Millennium Bridge", "t": "Bonus", "p": 20, "why": "London's sleek 'wobbly bridge' — and the one Death Eaters rip apart in the Harry Potter films. Walk it from Tate Modern to St Paul's.", "snap": "Straight down the bridge toward the dome."}, {"n": "St Paul's Cathedral dome", "t": "", "p": 10, "why": "Wren's 300-year-old dome — and the steps where Mary Poppins sang 'Feed the Birds'.", "snap": "The dome framed at the end of the bridge."}, {"n": "The Gherkin", "t": "Bonus", "p": 20, "why": "The glass bullet-shaped skyscraper (really named 30 St Mary Axe) — one of the City's most famous modern buildings.", "snap": "The curved glass tower from street level."}, {"n": "Sunset from the Sky Garden", "t": "Bonus", "p": 20, "why": "A free indoor jungle in the clouds atop the 'Walkie-Talkie' tower, with floor-to-ceiling windows over the whole city.", "snap": "The skyline glowing at dusk (you're booked for 8:30pm)."}, {"n": "Leadenhall Market", "t": "Legendary", "p": 30, "why": "Side-quest in the nearby City: this ornate Victorian arcade was filmed as the entrance to Diagon Alley in Harry Potter.", "snap": "The painted arches and cobbles — wand optional."}]}, {"label": "Day 5 · Fri 19 Jun", "title": "Last morning, then home", "color": "#d99323", "stops": [{"t": "Morning", "n": "Paddington & Little Venice", "lat": 51.5162982, "lon": -0.1765854, "kind": "sight", "note": "Last Paddington Bear photo, then a gentle canal walk. No museum today."}, {"t": "2:00 PM", "n": "Hilton — collect bags", "lat": 51.5193229, "lon": -0.1695228, "kind": "hotel", "note": "Back by ~2pm for luggage."}, {"t": "5:00 PM", "n": "Depart", "lat": null, "lon": null, "kind": "depart", "note": "Heathrow Express from Paddington is ~15 min."}], "finds": [{"n": "Ride a red double-decker bus", "t": "", "p": 10, "why": "London's buses have been red since 1907 — the front seat on the top deck is the best free view in the city.", "snap": "Front row, upper deck, road ahead."}, {"n": "A red telephone box", "t": "", "p": 10, "why": "The classic design is from 1924 and mostly kept now just because everyone loves it.", "snap": "Standing in the doorway of one."}, {"n": "A black cab", "t": "", "p": 10, "why": "Drivers must memorise 25,000 streets ('The Knowledge') before they're even allowed to drive one.", "snap": "Arm out, hailing one like a local."}, {"n": "A Tube roundel", "t": "", "p": 10, "why": "The red-circle-and-blue-bar symbol, born in 1908, is one of the most copied logos in the world.", "snap": "A station roundel with the station name inside."}, {"n": "One last Paddington Bear", "t": "Bonus", "p": 20, "why": "Bring the trip full circle — back to the bear and the station where it all started.", "snap": "At the Paddington statue or shop before you head to the airport."}, {"n": "Marble Arch", "t": "", "p": 10, "why": "A white marble triumphal arch that once stood in front of Buckingham Palace before being moved here by Hyde Park.", "snap": "Standing under the central arch."}, {"n": "A blue plaque", "t": "Hidden", "p": 20, "why": "Round blue signs mark the actual buildings where famous people lived — Dickens, Hendrix, Darwin and hundreds more.", "snap": "A plaque with a name you recognise."}, {"n": "A hidden cobbled mews", "t": "Hidden", "p": 20, "why": "Pretty cobbled lanes of old stables-turned-houses are tucked behind the grand streets all around your hotel.", "snap": "A flower-covered mews with no cars."}]}], "res": [{"when": "Tue 16 Jun · 1:00 PM", "what": "Afternoon Tea — Diamond Jubilee Tea Salon, Fortnum & Mason", "status": "Booked"}, {"when": "Tue 16 Jun · 6:30 PM", "what": "Dinner — Ayllu Paddington", "status": "Book ahead"}, {"when": "Wed 17 Jun · 10:50 AM", "what": "The British Museum — free timed entry", "status": "Book online"}, {"when": "Wed 17 Jun · 7:30 PM", "what": "The Lion King — Lyceum Theatre", "status": "Tickets held"}, {"when": "Thu 18 Jun · 8:30 PM", "what": "Sky Garden — free ticket or restaurant table", "status": "Book ahead"}, {"when": "Stay · 15–19 Jun", "what": "Hilton London Metropole, 225 Edgware Rd, W2", "status": "—"}], "tips": ["Set the kids up with contactless / Oyster for the Tube and buses.", "Book free timed slots in advance for the British Museum and the Sky Garden — they fill up.", "Tate Modern is free with no booking needed.", "London sunset on 18 Jun is ~9:20pm, so the 8:30 Sky Garden slot catches golden hour into dusk."]};
+const KIND={res:"Reservation",food:"Food",sight:"Visit",hotel:"Hotel",depart:"Depart"};
+const TIERS=[{m:0,n:"Just landed",i:"\uD83D\uDEEC"},{m:25,n:"City Explorer",i:"\uD83E\uDD49"},{m:50,n:"London Adventurer",i:"\uD83E\uDD48"},{m:75,n:"Treasure Hunter",i:"\uD83E\uDD47"},{m:100,n:"London Legend!",i:"\uD83D\uDC51"}];
+const tick='<svg viewBox="0 0 24 24"><polyline points="4,12.5 10,18 20,6"/></svg>';
+const $=s=>document.querySelector(s);
+
+// tabs
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  const id=b.dataset.t==='map'?'map-panel':b.dataset.t;
+  document.getElementById(id).classList.add('on');
+  if(b.dataset.t==='map'&&window._map){setTimeout(()=>window._map.invalidateSize(),60);}
+});
+
+// itinerary
+let ih='';
+DATA.days.forEach(d=>{
+  ih+=`<section class="daycard" style="--c:${d.color}"><div class="daylabel">${d.label}</div><div class="daytitle">${d.title}</div><ol class="stops">`;
+  let n=1;
+  d.stops.forEach(s=>{
+    const num = s.lat!=null?`<span class="snum">${n++}</span>`:`<span class="snum dep">\u2708</span>`;
+    const dir = s.lat!=null?`<a class="dir" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}">Directions</a>`:'';
+    ih+=`<li>${num}<div class="sbody"><div class="stime">${s.t} &middot; <b>${s.n}</b> <span class="kindtag k-${s.kind}">${KIND[s.kind]}</span></div><div class="snote">${s.note}</div>${dir}</div></li>`;
+  });
+  ih+='</ol></section>';
+});
+$('#itin').innerHTML=ih;
+
+// reservations
+let rh='';
+DATA.res.forEach(r=>{rh+=`<div class="resrow"><div><div class="reswhen">${r.when}</div><div class="reswhat">${r.what}</div></div><div class="resstatus">${r.status}</div></div>`;});
+rh+='<div class="tips"><b>Good to know</b><ul>'+DATA.tips.map(t=>`<li>${t}</li>`).join('')+'</ul></div>';
+$('#res').innerHTML=rh;
+
+// map (Leaflet)
+window.addEventListener('load',()=>{
+  const map=L.map('map',{scrollWheelZoom:false}).setView([51.509,-0.118],12);
+  window._map=map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+  const layers={}, all=[];
+  DATA.days.forEach((d,di)=>{
+    const g=L.layerGroup().addTo(map); layers[di]=g; let n=1;
+    d.stops.forEach(s=>{ if(s.lat==null)return;
+      const ic=L.divIcon({className:'',html:`<div style="background:${d.color};color:#fff;width:24px;height:24px;border-radius:50%;border:2px solid #fff;font:700 12px Arial;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.4)">${n}</div>`,iconSize:[24,24],iconAnchor:[12,12]});
+      L.marker([s.lat,s.lon],{icon:ic}).addTo(g)
+        .bindPopup(`<b>${s.t} &middot; ${s.n}</b><br>${s.note}<br><a target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}">Directions &rarr;</a>`);
+      all.push([s.lat,s.lon]); n++;
+    });
+    const pts=d.stops.filter(s=>s.lat!=null).map(s=>[s.lat,s.lon]);
+    if(pts.length>1) L.polyline(pts,{color:d.color,weight:3,dashArray:'2 8',opacity:.7}).addTo(g);
+  });
+  if(all.length) map.fitBounds(all,{padding:[30,30]});
+  let mf='';
+  DATA.days.forEach((d,di)=>{mf+=`<button data-d="${di}" class="on"><i style="background:${d.color}"></i>${d.label.split(' \u00b7 ')[0]}</button>`;});
+  $('#mfilter').innerHTML=mf;
+  document.querySelectorAll('#mfilter button').forEach(b=>b.onclick=()=>{
+    const di=b.dataset.d; b.classList.toggle('off');
+    if(b.classList.contains('off'))map.removeLayer(layers[di]);else layers[di].addTo(map);
+  });
+});
+
+// ---- treasure hunt ----
+const KEY='london_hunt_hub_v1';
+let state={done:{},prize:''};
+try{const r=JSON.parse(localStorage.getItem(KEY)||'{}');state.done=r.done||{};state.prize=r.prize||'';}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}};
+let MAX=0;DATA.days.forEach(d=>d.finds.forEach(f=>MAX+=f.p));
+
+function huntHTML(){
+  let h='<div class="meter"><div class="meterTop"><div class="rank"><b id="ri"></b> <span id="rn"></span></div><div class="pts"><span id="pn">0</span>/'+MAX+' pts</div></div><div class="bar"><div class="fill" id="fill"></div></div><div class="ticks"><span data-t="0">START</span><span data-t="25">25</span><span data-t="50">50</span><span data-t="75">75</span><span data-t="100">100</span></div></div>';
+  DATA.days.forEach((d,di)=>{
+    h+=`<div class="hdaytitle" style="--c:${d.color}">${d.label} &middot; ${d.title}</div>`;
+    d.finds.forEach((f,fi)=>{
+      const id=di+'-'+fi, done=state.done[id]?'done':'', leg=f.t==='Legendary'?'legend':'';
+      const tag=f.t?`<span class="ftag">${f.t}</span>`:'';
+      h+=`<div class="find ${done} ${leg}" data-id="${id}"><span class="cb">${tick}</span><div class="fbody"><div class="fname">${f.n}${tag}</div><div class="fwhy">${f.why}</div><div class="fsnap">\uD83D\uDCF8 ${f.snap}</div></div><span class="fp">+${f.p}</span><span class="stamp">Found</span></div>`;
+    });
+  });
+  h+='<div class="vault"><h2>\uD83D\uDDDD\uFE0F The Final Prize</h2><div class="lockNote" id="ln">Locked \u2014 reach 100% to claim</div><input id="prize" placeholder="Grown-ups: type the reward here\u2026"><br><button class="claim" id="claim">Keep hunting\u2026</button></div>';
+  return h;
+}
+$('#hunt').innerHTML=huntHTML();
+$('#prize').value=state.prize;
+$('#prize').oninput=e=>{state.prize=e.target.value;save();};
+document.querySelectorAll('.find').forEach(c=>c.onclick=()=>{const id=c.dataset.id;state.done[id]=!state.done[id];c.classList.toggle('done',state.done[id]);recalc();save();});
+function recalc(){
+  let now=0;DATA.days.forEach((d,di)=>d.finds.forEach((f,fi)=>{if(state.done[di+'-'+fi])now+=f.p;}));
+  const pct=Math.round(now/MAX*100);
+  $('#pn').textContent=now;$('#fill').style.width=pct+'%';
+  let t=TIERS[0];TIERS.forEach(x=>{if(pct>=x.m)t=x;});
+  $('#ri').textContent=t.i;$('#rn').textContent=t.n;
+  document.querySelectorAll('.ticks span').forEach(s=>s.classList.toggle('hit',pct>=+s.dataset.t));
+  const c=$('#claim');
+  if(pct>=100){c.classList.add('ready');c.textContent='\uD83C\uDF89 Claim your prize!';$('#ln').textContent='UNLOCKED \u2014 you did it!';}
+  else{c.classList.remove('ready');c.textContent=(100-pct)+'% to go\u2026';$('#ln').textContent='Locked \u2014 reach 100% to claim';}
+}
+$('#claim').onclick=()=>{if($('#claim').classList.contains('ready'))confetti();};
+function confetti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cs=['#cda350','#c8472e','#3f9d92','#faf4e6','#e0633f'];for(let i=0;i<90;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=cs[i%cs.length];c.style.animation=`fall ${1.6+Math.random()*1.6}s ${Math.random()*.5}s ease-in forwards`;document.body.appendChild(c);setTimeout(()=>c.remove(),3600);}}
+$('#reset').onclick=()=>{if(confirm('Clear every treasure and start over?')){state.done={};save();$('#hunt').innerHTML=huntHTML();bind();}};
+function bind(){$('#prize').value=state.prize;$('#prize').oninput=e=>{state.prize=e.target.value;save();};document.querySelectorAll('.find').forEach(c=>c.onclick=()=>{const id=c.dataset.id;state.done[id]=!state.done[id];c.classList.toggle('done',state.done[id]);recalc();save();});$('#claim').onclick=()=>{if($('#claim').classList.contains('ready'))confetti();};recalc();}
+recalc();
+</script></body></html>
