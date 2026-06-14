@@ -1,0 +1,395 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>London Treasure Hunt — June 15–19</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,800;9..144,900&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#13223a; --ink2:#1c2f4e; --ink3:#243c63;
+    --parchment:#f4ead4; --parchment-edge:#e2d2af;
+    --brass:#cda350; --brass-deep:#9b7a2e;
+    --red:#c8472e; --red-deep:#a3361f;
+    --cream:#faf4e6; --muted:#9bafce; --muted2:#6f86a8;
+    --thames:#3f9d92;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 600px at 80% -10%, #1f3458 0%, transparent 60%),
+      radial-gradient(900px 700px at -10% 110%, #1a2c4a 0%, transparent 55%),
+      var(--ink);
+    color:var(--cream);
+    font-family:"Inter",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px 64px}
+
+  /* ---- Hero ---- */
+  header.hero{padding:34px 0 14px;text-align:center}
+  .eyebrow{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--brass);margin-bottom:10px}
+  h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(38px,11vw,64px);
+    line-height:.94;margin:0;letter-spacing:-.01em}
+  h1 .l2{display:block;color:var(--brass);font-style:italic;font-weight:800}
+  .sub{color:var(--muted);font-size:14px;margin-top:14px}
+  .sub b{color:var(--cream);font-weight:600}
+
+  /* ---- Sticky meter ---- */
+  .meter{position:sticky;top:0;z-index:30;margin:18px 0 8px;
+    background:rgba(19,34,58,.86);backdrop-filter:blur(10px);
+    border:1px solid rgba(205,163,80,.28);border-radius:16px;padding:14px 16px}
+  .meterTop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .rank{font-family:"Fraunces",serif;font-weight:800;font-size:19px;display:flex;align-items:center;gap:8px}
+  .rankIcon{font-size:22px}
+  .pts{font-family:"Spline Sans Mono",monospace;font-size:13px;color:var(--brass);white-space:nowrap}
+  .bar{height:14px;border-radius:99px;background:#0d1a2e;margin-top:10px;overflow:hidden;
+    border:1px solid rgba(255,255,255,.06);position:relative}
+  .fill{height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--brass-deep),var(--brass) 70%,#f0d588);
+    transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  .ticks{display:flex;justify-content:space-between;margin-top:7px;
+    font-family:"Spline Sans Mono",monospace;font-size:9.5px;color:var(--muted2);letter-spacing:.04em}
+  .ticks span.hit{color:var(--brass)}
+
+  /* ---- Day sections ---- */
+  .day{margin-top:30px}
+  .dayHead{display:flex;align-items:flex-end;gap:12px;margin:0 4px 14px;
+    border-bottom:1px solid rgba(205,163,80,.22);padding-bottom:10px}
+  .dayNo{font-family:"Spline Sans Mono",monospace;font-size:12px;color:var(--brass);
+    border:1px solid var(--brass-deep);border-radius:8px;padding:5px 8px;white-space:nowrap}
+  .dayTitle{font-family:"Fraunces",serif;font-weight:800;font-size:21px;line-height:1.05;flex:1}
+  .dayTitle small{display:block;font-family:"Inter";font-weight:400;font-size:12px;
+    color:var(--muted);margin-top:3px;letter-spacing:0}
+  .dayCount{font-family:"Spline Sans Mono",monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+
+  /* ---- Find card ---- */
+  .card{position:relative;display:flex;gap:13px;align-items:flex-start;
+    background:var(--parchment);color:#33291a;border-radius:14px;padding:14px 14px 14px 13px;
+    margin-bottom:11px;cursor:pointer;overflow:hidden;
+    border:1px solid var(--parchment-edge);
+    box-shadow:0 10px 22px -16px rgba(0,0,0,.7);
+    transition:transform .12s ease, box-shadow .2s ease}
+  .card:active{transform:scale(.992)}
+  .card.done{background:#ece0c4;border-color:var(--brass)}
+  .card.done .name{color:#6f5a2c}
+  .card.legend{border-left:4px solid var(--brass)}
+  .box{flex:0 0 auto;width:30px;height:30px;border-radius:50%;margin-top:1px;
+    border:2.5px solid #b9a679;background:#fbf5e6;position:relative;transition:.18s}
+  .card.done .box{background:var(--red);border-color:var(--red-deep)}
+  .box svg{position:absolute;inset:0;margin:auto;width:17px;height:17px;
+    stroke:#fff;stroke-width:3.4;fill:none;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .25s ease .05s}
+  .card.done .box svg{stroke-dashoffset:0}
+  .body{flex:1;min-width:0}
+  .name{font-family:"Fraunces",serif;font-weight:700;font-size:16.5px;line-height:1.18;
+    display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+  .tagL{font-family:"Spline Sans Mono",monospace;font-size:9px;letter-spacing:.12em;
+    background:var(--brass);color:#2a2008;border-radius:5px;padding:2px 6px;text-transform:uppercase;font-weight:600}
+  .why{font-size:13.5px;color:#5a4d36;margin-top:5px}
+  .snap{font-size:12.5px;color:#8a5a3a;margin-top:7px;font-weight:500;
+    display:flex;gap:6px;align-items:baseline}
+  .snap b{color:#7a3f22;font-weight:600}
+  .val{position:absolute;right:11px;bottom:9px;font-family:"Spline Sans Mono",monospace;
+    font-size:10.5px;color:#9a8453;letter-spacing:.03em}
+  .card.done .val{color:var(--brass-deep)}
+  .stamp{position:absolute;right:-6px;top:8px;transform:rotate(11deg) scale(.5);opacity:0;
+    font-family:"Fraunces",serif;font-weight:900;font-size:15px;color:var(--red);
+    border:2.5px solid var(--red);border-radius:7px;padding:3px 9px;letter-spacing:.06em;
+    text-transform:uppercase;pointer-events:none;transition:.28s cubic-bezier(.2,1.4,.4,1)}
+  .card.done .stamp{opacity:.92;transform:rotate(-8deg) scale(1)}
+
+  /* ---- Prize vault ---- */
+  .vault{margin-top:36px;border-radius:18px;padding:24px 20px;text-align:center;
+    background:linear-gradient(180deg,var(--ink2),var(--ink));
+    border:1.5px solid rgba(205,163,80,.4);position:relative;overflow:hidden}
+  .vault h2{font-family:"Fraunces",serif;font-weight:900;font-size:25px;margin:0 0 4px;
+    display:flex;gap:10px;justify-content:center;align-items:center}
+  .vault .lockNote{font-family:"Spline Sans Mono",monospace;font-size:11px;color:var(--muted);
+    letter-spacing:.06em;margin-bottom:16px}
+  .prizeBox{background:rgba(255,255,255,.05);border:1px dashed rgba(205,163,80,.5);
+    border-radius:12px;padding:14px;margin:0 auto;max-width:440px}
+  .prizeLbl{font-family:"Spline Sans Mono",monospace;font-size:10px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--brass);margin-bottom:8px}
+  #prize{width:100%;border:none;background:transparent;color:var(--cream);text-align:center;
+    font-family:"Fraunces",serif;font-weight:600;font-size:18px;resize:none;outline:none;line-height:1.35}
+  #prize::placeholder{color:var(--muted2);font-style:italic;font-weight:500}
+  .claim{margin-top:18px;border:none;border-radius:12px;padding:14px 22px;font-family:"Fraunces",serif;
+    font-weight:800;font-size:17px;letter-spacing:.01em;cursor:pointer;width:100%;max-width:440px;
+    background:#27384f;color:var(--muted2);transition:.2s;pointer-events:none}
+  .claim.ready{background:linear-gradient(90deg,var(--red),#e0633f);color:#fff;
+    pointer-events:auto;box-shadow:0 14px 30px -12px rgba(200,71,46,.8);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
+  footer{text-align:center;margin-top:30px;color:var(--muted2);font-size:12px}
+  .reset{background:none;border:1px solid rgba(255,255,255,.14);color:var(--muted);
+    font-family:"Spline Sans Mono",monospace;font-size:11px;border-radius:8px;padding:7px 12px;
+    cursor:pointer;margin-top:12px}
+  .reset:active{background:rgba(255,255,255,.06)}
+
+  /* confetti */
+  .confetti{position:fixed;top:-12px;width:10px;height:14px;z-index:99;pointer-events:none;border-radius:2px}
+  @keyframes fall{to{transform:translateY(108vh) rotate(720deg);opacity:.9}}
+  @media (prefers-reduced-motion:reduce){
+    .fill{transition:none}.stamp{transition:none}.claim.ready{animation:none}
+  }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Field Log · 15–19 June</div>
+    <h1>London<span class="l2">Treasure Hunt</span></h1>
+    <p class="sub">A 5-day quest across the city. Find each treasure, tap to claim it, and fill the meter.
+      Hit <b>100%</b> to become a <b>London Legend</b> and unlock the prize.</p>
+  </header>
+
+  <div class="meter">
+    <div class="meterTop">
+      <div class="rank"><span class="rankIcon" id="rankIcon">🛬</span><span id="rankName">Just landed</span></div>
+      <div class="pts"><span id="ptsNow">0</span> / <span id="ptsMax">0</span> treasure</div>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="ticks">
+      <span data-t="0">START</span><span data-t="25">🥉 25</span><span data-t="50">🥈 50</span>
+      <span data-t="75">🥇 75</span><span data-t="100">👑 100</span>
+    </div>
+  </div>
+
+  <div id="days"></div>
+
+  <div class="vault" id="vault">
+    <h2><span>🗝️</span> The Final Prize</h2>
+    <div class="lockNote" id="lockNote">Locked — reach 100% to claim</div>
+    <div class="prizeBox">
+      <div class="prizeLbl">Grown-ups: write the reward here</div>
+      <textarea id="prize" rows="2" placeholder="e.g. you pick where we eat on the last night…"></textarea>
+    </div>
+    <button class="claim" id="claim">Keep hunting…</button>
+  </div>
+
+  <footer>
+    Tip: take the photo, then tap the circle to stamp it FOUND. Your progress saves on this device.
+    <br><button class="reset" id="reset">Reset the whole hunt</button>
+  </footer>
+</div>
+
+<script>
+const DATA = [
+  { day:"Day 1 · Mon", title:"Paddington & the Royal Parks", note:"Your home turf — all walkable from the hotel", finds:[
+    {n:"Paddington Bear statue",t:"",p:10,why:"The famous bear came from 'Darkest Peru' and arrived at this exact station — the books begin right here on the platform.",snap:"Sit next to him with his battered suitcase (Platform 1)."},
+    {n:"A houseboat in Little Venice",t:"",p:10,why:"A hidden canal where people actually live on long, brightly painted narrowboats. It feels nothing like a big city.",snap:"A colourful boat mirrored in the still water."},
+    {n:"The Peter Pan statue",t:"Hidden",p:20,why:"Author J.M. Barrie had it placed secretly overnight in 1912 so children would think it appeared by magic.",snap:"The tiny fairies and animals climbing the base."},
+    {n:"The Elfin Oak",t:"Hidden",p:20,why:"A 900-year-old tree stump carved with little elves, witches and animals hiding in the bark.",snap:"Find the smallest creature you can spot."},
+    {n:"A wild green parakeet",t:"Legendary",p:30,why:"Thousands of bright-green parrots live wild in the parks — and nobody knows for sure how they got to London.",snap:"One in flight or perched (they sometimes land on an open hand)."},
+    {n:"The pirate ship",t:"",p:10,why:"The giant wooden galleon at the Diana Memorial Playground, built for exactly this kind of adventure.",snap:"At the ship's wheel, captain's face on."},
+    {n:"The golden Albert Memorial",t:"",p:10,why:"A glittering gold monument Queen Victoria built for her husband — over the top on purpose.",snap:"The gleaming gold figure under the spire."},
+    {n:"Paddington's Brunel roof",t:"",p:10,why:"The station's huge wave-like iron-and-glass roof was designed by Isambard Kingdom Brunel in 1854 — engineering built like a cathedral.",snap:"Phone up at the curved glass roof spans."},
+    {n:"The Merchant Square fan bridge",t:"Hidden",p:20,why:"A hidden footbridge in Paddington Basin that lifts in five steel 'fingers' like a folding fan — catch it opening if you can.",snap:"The angled steel beams of the bridge."},
+    {n:"The Italian Gardens",t:"Hidden",p:20,why:"Ornamental Victorian water gardens at the top of the Long Water — said to be a gift from Prince Albert to Queen Victoria.",snap:"The fountains and carved stone urns."},
+    {n:"Royal Albert Hall",t:"",p:10,why:"The vast round red-brick concert hall from 1871 — a dome you'll recognise the instant you see it.",snap:"The whole oval building in one frame."},
+    {n:"Kensington Palace gates",t:"",p:10,why:"A working royal home for 300 years — the golden gates became a sea of flowers for Princess Diana in 1997.",snap:"The ornate gold gates."},
+    {n:"The pastel houses of Notting Hill",t:"Bonus",p:20,why:"The candy-coloured terraced houses around Portobello Road are one of London's most-photographed streets — and the setting of the film 'Notting Hill'. A short hop west of the hotel.",snap:"A row of pink, blue and mint houses (or the famous travel-bookshop)."},
+    {n:"221B Baker Street",t:"Bonus",p:20,why:"The home of Sherlock Holmes — there's a statue of the great detective outside the Tube station and the door marked 221B nearby. A short hop from the hotel.",snap:"By the Sherlock statue, or the 221B door in a deerstalker pose."},
+    {n:"'Hope' the blue whale",t:"Bonus",p:20,why:"The Natural History Museum's centrepiece — a 25m blue whale skeleton diving over the grand Hintze Hall. The largest animal that has ever lived.",snap:"Standing under the whale in the great hall."},
+    {n:"The roaring T. rex",t:"Bonus",p:20,why:"A life-size animatronic T. rex in the museum's dinosaur gallery that moves and roars as if it's spotted you.",snap:"With the dinosaur caught mid-roar."},
+  ]},
+  { day:"Day 2 · Tue", title:"Royal London & Piccadilly", note:"Palace and parks, 1pm high tea at Fortnum & Mason, then 6:30 dinner at Ayllu", finds:[
+    {n:"Big Ben on the hour",t:"",p:10,why:"The bell weighs 13.7 tonnes and its bongs are broadcast around the world. Time your visit to hear it.",snap:"The clock face right as it chimes."},
+    {n:"Boudica's war chariot",t:"",p:20,why:"A warrior queen who burned Roman London to the ground in AD 60 — now charging on a bronze chariot by the bridge.",snap:"The rearing horses, no reins."},
+    {n:"A mounted Horse Guard",t:"",p:10,why:"The King's official bodyguards, sitting perfectly still on horseback at Horse Guards.",snap:"Standing beside the horse (look — don't touch!)."},
+    {n:"A pelican in St James's Park",t:"",p:20,why:"Pelicans have lived here since 1664, a gift from a Russian ambassador. They get fed in the afternoon.",snap:"One near Duck Island around 2:30pm."},
+    {n:"The Royal Standard flag",t:"Bonus",p:20,why:"If this flag is flying over Buckingham Palace, the King is actually home right now. If not, he's out.",snap:"The flagpole on the palace roof."},
+    {n:"The Fortnum & Mason clock",t:"",p:20,why:"Every hour, models of Mr Fortnum and Mr Mason step out and bow to each other to chimes — right above your tea.",snap:"The two figures over the shopfront on Piccadilly."},
+    {n:"Eros at Piccadilly Circus",t:"",p:10,why:"One of the first statues ever cast in aluminium, surrounded by the most famous lights in London.",snap:"The winged archer under the giant screens."},
+    {n:"Climb a Trafalgar Square lion",t:"",p:10,why:"Four huge bronze lions guard Nelson's Column — cast from the metal of melted-down enemy cannons.",snap:"Sitting up on a lion's paw."},
+    {n:"Westminster Abbey",t:"",p:10,why:"Every English coronation since 1066 has happened here, and many kings and queens lie buried inside this soaring Gothic church.",snap:"The twin towers of the west front."},
+    {n:"Westminster Bridge",t:"",p:10,why:"It's painted green to match the seats in the House of Commons at this end — Lambeth Bridge upriver is red, for the Lords.",snap:"The green ironwork with Big Ben behind."},
+    {n:"The Blue Bridge view",t:"Hidden",p:20,why:"From the little blue bridge in St James's Park you get the most fairytale view in London — the palace one way, a skyline of domes and turrets the other.",snap:"The 'castle' skyline over the lake."},
+    {n:"Admiralty Arch",t:"",p:10,why:"A grand triple-arched gateway joining Trafalgar Square to The Mall — there's even a tiny carved nose hidden inside one arch.",snap:"Looking through the arches down The Mall."},
+    {n:"London's smallest police station",t:"Hidden",p:20,why:"A one-person police post hidden inside a hollow stone lamp-base in the corner of Trafalgar Square.",snap:"The little round stone 'box' everyone walks straight past."},
+  ]},
+  { day:"Day 3 · Wed", title:"British Museum, Covent Garden & the show", note:"Museum at 10:50, your two food spots, then The Lion King at 7:30", finds:[
+    {n:"The Rosetta Stone",t:"",p:10,why:"The carved stone that finally cracked the code of Egyptian hieroglyphs — the same message written in three scripts at once.",snap:"Over the heads of the crowd around its case."},
+    {n:"An Egyptian mummy",t:"Bonus",p:20,why:"Real mummies thousands of years old, wrapped and painted for the journey to the afterlife.",snap:"A decorated coffin (sarcophagus)."},
+    {n:"The Great Court glass roof",t:"",p:10,why:"Europe's largest covered square, under a swirling glass-and-steel roof of 3,212 panes — no two the same.",snap:"Lying back with your phone pointed straight up."},
+    {n:"A Covent Garden street act",t:"",p:10,why:"Performers have entertained on this spot since 1662 — today they audition for the right to perform.",snap:"A juggler or a 'floating' act mid-trick."},
+    {n:"Neal's Yard",t:"Hidden",p:20,why:"A secret rainbow-coloured courtyard tucked down a narrow alley in Seven Dials. Easy to walk straight past.",snap:"The clashing bright walls and flowers."},
+    {n:"The Seven Dials sundial",t:"Hidden",p:20,why:"One pillar with six sundials where seven streets meet — the seventh dial is the column itself.",snap:"Looking straight up the pillar."},
+    {n:"A crispy roll on Villiers St",t:"Food",p:10,why:"Your foodie mission: cheap sushi-meets-fried-chicken rolls near Embankment that went viral online.",snap:"The roll before the first bite."},
+    {n:"Humble Crumble custard",t:"Food",p:10,why:"Warm crumble with unlimited build-your-own custard, hidden in the Seven Dials market hall.",snap:"The custard pour in action."},
+    {n:"Cleopatra's Needle",t:"Bonus",p:20,why:"A 3,500-year-old Egyptian obelisk — older than London itself — guarded by two bronze sphinxes still scarred by a WWI bomb.",snap:"The hieroglyphics or a sphinx's face."},
+    {n:"Somerset House fountains",t:"Bonus",p:20,why:"55 water jets shoot straight up from the courtyard floor — in summer kids dart between them.",snap:"Mid-jump in the water."},
+    {n:"The Easter Island statue",t:"Bonus",p:20,why:"A four-tonne stone ancestor figure carved on Rapa Nui and brought to the British Museum in 1869 — towering over everyone around it.",snap:"Looking up at the giant stone face."},
+    {n:"Goodwin's Court",t:"Hidden",p:20,why:"A tiny gas-lit alley of curved Georgian shopfronts near Covent Garden — many believe it inspired Diagon Alley.",snap:"The bow-fronted glass windows and old lamps."},
+    {n:"Twinings tea shop",t:"Hidden",p:20,why:"London's oldest shop still on its original spot (since 1706) — a doorway so narrow you'd walk past it, on the Strand.",snap:"The slim doorway with the golden lion above it."},
+    {n:"The view from Waterloo Bridge",t:"Bonus",p:20,why:"Londoners call it the best free view in the city — St Paul's and the City one way, Big Ben and the Eye the other.",snap:"The skyline looking both directions."},
+    {n:"Platform 9¾ at King's Cross",t:"Bonus",p:20,why:"A luggage trolley vanishing into the wall, exactly like in Harry Potter — with a wizard shop right beside it. A short hop north of the museum.",snap:"Pushing the half-buried trolley, scarf flying."},
+    {n:"Carnaby Street",t:"",p:10,why:"A pedestrian street of bright shopfronts under giant colourful decorations — the home of London fashion since the 1960s, and very Instagram.",snap:"Standing under the arch of overhead decorations."},
+    {n:"The screens at Outernet",t:"Bonus",p:20,why:"Step inside a four-storey hall wrapped in giant LED screens by Tottenham Court Road — free immersive shows, an emoji shower, and your own social posts can pop up on the walls.",snap:"Looking up, wrapped in the screens (or caught in the emoji shower)."},
+    {n:"Woburn Walk (Bridgerton)",t:"Hidden",p:20,why:"One of London's best-preserved Regency streets, with curved shopfronts and tiny balconies — it pops up in Bridgerton. Tucked near the British Museum.",snap:"Down the little black-railinged street like you're in the Ton."},
+    {n:"A TSUJIRI matcha swirl",t:"Food",p:10,why:"Soft-serve from a Kyoto tea house that's been making matcha since 1860 — the green swirl is half the fun. Branches in Chinatown and Camden.",snap:"The matcha soft-serve before it melts."},
+    {n:"The Lion King at the Lyceum",t:"Legendary",p:30,why:"The big one. The opening 'Circle of Life' with the animal puppets is one of theatre's all-time great moments.",snap:"Outside the theatre before the show."},
+  ]},
+  { day:"Day 4 · Thu", title:"River, Tate Modern & Bankside", note:"A South Bank walk along the Thames (no Tower today), ending at the Sky Garden at 8:30", finds:[
+    {n:"Tower Bridge from the bank",t:"",p:10,why:"The most photographed bridge in the world — those 'medieval' towers are really steel dressed in stone (1894), and it's the backdrop of the Spider-Man: Far From Home finale.",snap:"The whole bridge from the riverside, towers and all."},
+    {n:"St Dunstan in the East",t:"Hidden",p:20,why:"A church bombed in the Blitz, now a magical ruin wrapped in climbing plants — one of London's most-photographed hidden gardens.",snap:"The ivy framing the empty gothic windows."},
+    {n:"HMS Belfast",t:"Bonus",p:20,why:"A real Second World War battle cruiser moored on the Thames, guns still aimed downriver.",snap:"The grey warship against the skyline."},
+    {n:"The Shard",t:"",p:10,why:"Western Europe's tallest building at 310m, shaped to look like a splinter of glass.",snap:"Phone flat to a wall, looking straight up the point."},
+    {n:"Borough Market (Bridget Jones)",t:"Food",p:10,why:"London's oldest food market and a film favourite — Bridget Jones lived in the flat right above it. Get the famous chocolate strawberries.",snap:"A warm chocolate strawberry, or the green market sign."},
+    {n:"Winchester Palace rose window",t:"Hidden",p:20,why:"The ruined wall of a 700-year-old bishop's palace with a beautiful stone rose window, tucked in a lane behind Borough Market.",snap:"The circular window in the old ruin."},
+    {n:"The Golden Hinde galleon",t:"Bonus",p:20,why:"A full-size replica of the Tudor ship Sir Francis Drake sailed all the way around the world.",snap:"The masts of the little ship in its dock."},
+    {n:"Shakespeare's Globe",t:"",p:10,why:"A faithful rebuild of the open-air wooden 'O' where Shakespeare's plays were first performed 400 years ago.",snap:"The white-and-timber round theatre."},
+    {n:"Tate Modern Turbine Hall",t:"Bonus",p:20,why:"A giant former power station turned free modern-art museum — the cavernous Turbine Hall holds huge installations, and the upper floors have skyline views.",snap:"The vast hall, or your favourite weird artwork."},
+    {n:"The London Eye",t:"Bonus",p:20,why:"Europe's tallest cantilevered observation wheel — 135m up with all of London below. Best reached by a Thames river boat gliding past Parliament.",snap:"The whole wheel from across the river, or the view from your capsule."},
+    {n:"The Millennium Bridge",t:"Bonus",p:20,why:"London's sleek 'wobbly bridge' — and the one Death Eaters rip apart in the Harry Potter films. Walk it from Tate Modern to St Paul's.",snap:"Straight down the bridge toward the dome."},
+    {n:"St Paul's Cathedral dome",t:"",p:10,why:"Wren's 300-year-old dome — and the steps where Mary Poppins sang 'Feed the Birds'.",snap:"The dome framed at the end of the bridge."},
+    {n:"The Gherkin",t:"Bonus",p:20,why:"The glass bullet-shaped skyscraper (really named 30 St Mary Axe) — one of the City's most famous modern buildings.",snap:"The curved glass tower from street level."},
+    {n:"Sunset from the Sky Garden",t:"Bonus",p:20,why:"A free indoor jungle in the clouds atop the 'Walkie-Talkie' tower, with floor-to-ceiling windows over the whole city.",snap:"The skyline glowing at dusk (you're booked for 8:30pm)."},
+    {n:"The view from Horizon 22",t:"Bonus",p:20,why:"London's highest free viewpoint — the 58th floor of 22 Bishopsgate, looking down over the Gherkin, the Shard and the whole City. Book a free slot.",snap:"The City skyline far below through the glass."},
+    {n:"Leadenhall Market",t:"Legendary",p:30,why:"Side-quest in the nearby City: this ornate Victorian arcade was filmed as the entrance to Diagon Alley in Harry Potter.",snap:"The painted arches and cobbles — wand optional."},
+  ]},
+  { day:"Day 5 · Fri", title:"Last day — classic London finds", note:"No museum today — tick these anytime, perfect for the final morning", finds:[
+    {n:"Ride a red double-decker bus",t:"",p:10,why:"London's buses have been red since 1907 — the front seat on the top deck is the best free view in the city.",snap:"Front row, upper deck, road ahead."},
+    {n:"A red telephone box",t:"",p:10,why:"The classic design is from 1924 and mostly kept now just because everyone loves it.",snap:"Standing in the doorway of one."},
+    {n:"A black cab",t:"",p:10,why:"Drivers must memorise 25,000 streets ('The Knowledge') before they're even allowed to drive one.",snap:"Arm out, hailing one like a local."},
+    {n:"A Tube roundel",t:"",p:10,why:"The red-circle-and-blue-bar symbol, born in 1908, is one of the most copied logos in the world.",snap:"A station roundel with the station name inside."},
+    {n:"One last Paddington Bear",t:"Bonus",p:20,why:"Bring the trip full circle — back to the bear and the station where it all started.",snap:"At the Paddington statue or shop before you head to the airport."},
+    {n:"Marble Arch",t:"",p:10,why:"A white marble triumphal arch that once stood in front of Buckingham Palace before being moved here by Hyde Park.",snap:"Standing under the central arch."},
+    {n:"A blue plaque",t:"Hidden",p:20,why:"Round blue signs mark the actual buildings where famous people lived — Dickens, Hendrix, Darwin and hundreds more.",snap:"A plaque with a name you recognise."},
+    {n:"A hidden cobbled mews",t:"Hidden",p:20,why:"Pretty cobbled lanes of old stables-turned-houses are tucked behind the grand streets all around your hotel.",snap:"A flower-covered mews with no cars."},
+  ]},
+];
+
+const TIERS=[
+  {min:0,name:"Just landed",icon:"🛬"},
+  {min:25,name:"City Explorer",icon:"🥉"},
+  {min:50,name:"London Adventurer",icon:"🥈"},
+  {min:75,name:"Treasure Hunter",icon:"🥇"},
+  {min:100,name:"London Legend!",icon:"👑"},
+];
+
+let state={done:{},prize:""};
+const KEY="london_hunt_v1";
+let MAX=0;
+
+const tick=`<svg viewBox="0 0 24 24"><polyline points="4,12.5 10,18 20,6"/></svg>`;
+
+function render(){
+  const days=document.getElementById("days");
+  let html="";
+  DATA.forEach((d,di)=>{
+    const total=d.finds.reduce((s,f)=>s+f.p,0);
+    let got=0;
+    let cards="";
+    d.finds.forEach((f,fi)=>{
+      const id=di+"-"+fi;
+      const done=!!state.done[id];
+      if(done) got+=f.p;
+      const legend=(f.t==="Legendary");
+      cards+=`<div class="card ${done?"done":""} ${legend?"legend":""}" data-id="${id}">
+        <div class="box">${tick}</div>
+        <div class="body">
+          <div class="name">${f.n}${f.t?`<span class="tagL">${f.t}</span>`:""}</div>
+          <div class="why">${f.why}</div>
+          <div class="snap"><span>📸</span><span><b>Snap:</b> ${f.snap}</span></div>
+        </div>
+        <div class="val">+${f.p}</div>
+        <div class="stamp">Found</div>
+      </div>`;
+    });
+    html+=`<section class="day">
+      <div class="dayHead">
+        <span class="dayNo">${d.day}</span>
+        <div class="dayTitle">${d.title}<small>${d.note}</small></div>
+        <span class="dayCount" id="dc-${di}">${got}/${total}</span>
+      </div>${cards}</section>`;
+  });
+  days.innerHTML=html;
+  days.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("click",()=>toggle(c.dataset.id));
+  });
+}
+
+function recalc(){
+  let now=0;
+  DATA.forEach((d,di)=>{
+    let dgot=0,dtot=0;
+    d.finds.forEach((f,fi)=>{dtot+=f.p; if(state.done[di+"-"+fi]){now+=f.p;dgot+=f.p;}});
+    const el=document.getElementById("dc-"+di); if(el) el.textContent=dgot+"/"+dtot;
+  });
+  const pct=MAX? Math.round(now/MAX*100):0;
+  document.getElementById("ptsNow").textContent=now;
+  document.getElementById("fill").style.width=pct+"%";
+  let tier=TIERS[0];
+  TIERS.forEach(t=>{if(pct>=t.min)tier=t;});
+  document.getElementById("rankName").textContent=tier.name;
+  document.getElementById("rankIcon").textContent=tier.icon;
+  document.querySelectorAll(".ticks span").forEach(s=>{
+    s.classList.toggle("hit", pct>=+s.dataset.t);
+  });
+  const claim=document.getElementById("claim");
+  const lockNote=document.getElementById("lockNote");
+  if(pct>=100){
+    claim.classList.add("ready");claim.textContent="🎉 Claim your prize!";
+    lockNote.textContent="UNLOCKED — you did it!";
+  }else{
+    claim.classList.remove("ready");
+    claim.textContent=`${100-pct}% to go…`;
+    lockNote.textContent="Locked — reach 100% to claim";
+  }
+}
+
+function toggle(id){
+  state.done[id]=!state.done[id];
+  const card=document.querySelector(`.card[data-id="${id}"]`);
+  if(card) card.classList.toggle("done",state.done[id]);
+  recalc();save();
+}
+
+function fireConfetti(){
+  if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  const cols=["#cda350","#c8472e","#3f9d92","#faf4e6","#e0633f"];
+  for(let i=0;i<90;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=cols[i%cols.length];
+    c.style.animation=`fall ${1.6+Math.random()*1.6}s ${Math.random()*0.5}s ease-in forwards`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3800);
+  }
+}
+
+/* ---- persistence (graceful if storage unavailable) ---- */
+async function save(){
+  try{ await window.storage.set(KEY, JSON.stringify(state), false); }catch(e){}
+}
+async function load(){
+  try{
+    const r=await window.storage.get(KEY,false);
+    if(r&&r.value){ const s=JSON.parse(r.value); state.done=s.done||{}; state.prize=s.prize||""; }
+  }catch(e){}
+}
+
+(async function init(){
+  MAX=DATA.reduce((s,d)=>s+d.finds.reduce((a,f)=>a+f.p,0),0);
+  document.getElementById("ptsMax").textContent=MAX;
+  await load();
+  render();
+  const prize=document.getElementById("prize");
+  prize.value=state.prize||"";
+  prize.addEventListener("input",()=>{state.prize=prize.value;save();});
+  recalc();
+  document.getElementById("claim").addEventListener("click",()=>{
+    if(document.getElementById("claim").classList.contains("ready")) fireConfetti();
+  });
+  document.getElementById("reset").addEventListener("click",()=>{
+    if(confirm("Clear every treasure and start over?")){
+      state.done={}; render(); recalc(); save();
+      document.querySelectorAll(".card").forEach(c=>c.classList.remove("done"));
+    }
+  });
+})();
+</script>
